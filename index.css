@@ -1,0 +1,31 @@
+/** @format */
+body {
+  font-family: sans-serif;
+  font-weight: 100;
+  line-height: 1.5em;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%
+}
+
+.carousel {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#previous, #next {
+  margin: 8px;
+}
