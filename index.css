@@ -9,61 +9,94 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   height: 100%;
   text-align: center;
 }
 
+/* Align previous + card + next */
 .carousel {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-}
-
-.content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#stations-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 50%;
+  margin: 16px;
+  transform-style: preserve-3d;
 }
 
 #previous,
 #next {
-  margin: 8px;
+  z-index: 800;
 }
 
-.footer {
-  margin-top: 24px;
+.card {
+  background: #c4c4c4;
+  width: 600px;
+  height: 300px;
+  padding: 50px 25px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  -webkit-transition: opacity 0.2s ease-in-out;
+  -moz-transition: opacity 0.2s ease-in-out;
+  -ms-transition: opacity 0.2s ease-in-out;
+  -o-transition: opacity 0.2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
 }
 
-.button {
-  background-color: #ffffff;
-  border: 2px solid black;
+/* Circle with centered text */
+#station-abbreviation {
+  background: #838383;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #ffffff;
+}
+
+#station-info {
+  display: flex;
+  flex-direction: column;
+  color: #7a7a7a;
+  text-align: left;
+}
+
+/* Scrollable list with width set to computed card width */
+#stations-list {
+  display: flex;
+  width: 650px;
+  overflow: auto;
+}
+
+.station-button {
+  background-color: #c4c4c4;
+  border: 2px solid #c4c4c4;
+  border-radius: 4px;
   padding: 8px 16px;
   color: black;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 12px;
+  font-size: 10px;
   margin: 4px;
 }
 
-.button.selected {
-  background-color: #484848;
-  border: 2px solid black;
-  padding: 8px 16px;
-  color: white;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 12px;
-  margin: 4px;
+.station-button.selected {
+  border: 2px solid#53C1FF;
+  font-weight: bold;
+}
+
+.station-button:hover {
+  background-color: #838383;
+  cursor: pointer;
+}
+
+.footer {
+  margin-top: 24px;
 }

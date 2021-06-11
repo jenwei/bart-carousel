@@ -1,24 +1,5 @@
 /** @format */
 
-/**
- * General TODOs
- * - Extract Bart data-gathering logic into separate file
- * - Combine ETD functions as they're quite similar
- * - Add keyboard nav (e.g. left, right key)
- * - DRY up code
- *
- * TODOs re: carousel nav
- * - Consider disabling the button?
- * - (Nice to have) Show loading spinner
- * - Update currentStation to next station in stationsMappedByAbbr
- * - Use getETDsByStation() to update ETD for next station
- * - (Nice to have) Once data is fetched, remove loading spinner + show updated card
- */
-
-/**
- * Local Dev / Testing - use VSCode Live Server
- */
-
 // Public Bart API key
 const bartAPI = {
   key: "MW9S-E7SL-26DU-VV8V",
@@ -27,16 +8,13 @@ const bartAPI = {
 
 var stationsList = [];
 
-// Key stations by abbr
-var stationsMappedByAbbr = {};
-
 // Used to keep track of selected station
 var currentStationAbbr = undefined;
 var currentStationIndex = undefined;
 
-/**
- * BART data-gathering + manipulating
- */
+// Max # of next arrivals to display
+var MAX_NEXT_ARRIVALS = 3;
+
 function getAllStations() {
   // https://api.bart.gov/docs/stn/stns.aspx
   const stationsPath = buildResourcePath("stns");
@@ -85,7 +63,10 @@ function buildResourcePath(command, options = {}) {
 /**
  * Helper to get all station-related data needed and set it up for card carousel display
  */
-function setup() {
+function setupDataAndDisplay() {
+  // Key stations by abbr
+  var stationsMappedByAbbr = {};
+
   // Get all stations
   getAllStations()
     .then((stationList) => {
@@ -103,18 +84,23 @@ function setup() {
     })
     .then((stationList) => {
       console.log("Adding ETD data...");
+      if (!stationList) {
+        return;
+      }
       stationList.forEach((station) => {
-        stationsMappedByAbbr[station.abbr] = {
-          ...stationsMappedByAbbr[station.abbr],
-          nextArrivals: station.etd,
-        };
+        if (station.etd) {
+          stationsMappedByAbbr[station.abbr] = {
+            ...stationsMappedByAbbr[station.abbr],
+            nextArrivals: station.etd,
+          };
+        }
       });
       console.log("Done adding ETD data");
 
       stationsList = Object.values(stationsMappedByAbbr);
 
       // Default current station shown to first one returned from API
-      currentStationAbbr = stationList[0].abbr;
+      currentStationAbbr = stationsList[0].abbr;
       currentStationIndex = 0;
 
       return;
@@ -137,8 +123,9 @@ function selectStation(id) {
 
   // Update card
   populateCarouselCard(station);
+  document.querySelector(".card").style.opacity = 1;
 
-  // Add selected class to newly selected station
+  // Add selected class to newly selected station in list
   var newlySelectedEl = document.getElementById("" + currentStationIndex);
   newlySelectedEl.classList.add("selected");
 }
@@ -156,15 +143,22 @@ function populateCarouselCard(station) {
   var nextArrivalsEl = document.querySelector("#station-next-arrivals");
   var nextArrivalsInnerHTML = "";
   var nextArrivals = station.nextArrivals;
-  nextArrivals.forEach((arrival, index) => {
-    nextArrivalsInnerHTML += "<strong>" + arrival.abbreviation + "</strong>";
-    // Only showing the nearest arrival for a given destination
-    nextArrivalsInnerHTML += " (" + arrival.estimate[0].direction + ")";
-    nextArrivalsInnerHTML += " - " + arrival.estimate[0].minutes + " minute(s)";
-    if (index != nextArrivals.length - 1) {
-      nextArrivalsInnerHTML += "<br>";
-    }
-  });
+
+  // Check that nextArrivals is truthy before processing
+  if (station.nextArrivals) {
+    nextArrivals.slice(0, MAX_NEXT_ARRIVALS).forEach((arrival, index) => {
+      nextArrivalsInnerHTML += "<strong>" + arrival.abbreviation + "</strong>";
+      // Only showing the nearest arrival for a given destination
+      nextArrivalsInnerHTML += " (" + arrival.estimate[0].direction + ")";
+      nextArrivalsInnerHTML +=
+        " - " + arrival.estimate[0].minutes + " minute(s)";
+      if (index != nextArrivals.length - 1) {
+        nextArrivalsInnerHTML += "<br>";
+      }
+    });
+  } else {
+    nextArrivalsInnerHTML = "No known arrivals at this time";
+  }
   nextArrivalsEl.innerHTML = nextArrivalsInnerHTML;
 }
 
@@ -174,9 +168,9 @@ function populateStationsList() {
   stationsList.forEach((station, index) => {
     stationsListInnerHTML += '<button id="' + index;
     if (index === currentStationIndex) {
-      stationsListInnerHTML += '" class="button selected">';
+      stationsListInnerHTML += '" class="station-button selected">';
     } else {
-      stationsListInnerHTML += '" class="button">';
+      stationsListInnerHTML += '" class="station-button">';
     }
     stationsListInnerHTML += station.abbr + "</button>";
     stationsListEl.innerHTML = stationsListInnerHTML;
@@ -184,19 +178,16 @@ function populateStationsList() {
 }
 
 function updateDisplay() {
-  console.log(stationsMappedByAbbr);
+  console.log(stationsList);
   populateCarouselCard(stationsList[currentStationIndex]);
   populateStationsList();
   // Set time
   const today = new Date();
   document.querySelector("#base-time").innerHTML =
-    "Last calculated at " + today.toString();
+    "Last calculated " + today.toString();
 }
 
 const previousEl = document.getElementById("previous");
-const nextEl = document.getElementById("next");
-const stationsListEl = document.getElementById("stations-list");
-
 previousEl.addEventListener("click", function () {
   if (currentStationIndex === 0) return;
   console.log("Go to previous card");
@@ -204,6 +195,7 @@ previousEl.addEventListener("click", function () {
   selectStation(currentStationIndex);
 });
 
+const nextEl = document.getElementById("next");
 nextEl.addEventListener("click", function () {
   if (currentStationIndex === stationsList.length - 1) return;
   console.log("Go to next card");
@@ -211,8 +203,9 @@ nextEl.addEventListener("click", function () {
   selectStation(currentStationIndex);
 });
 
+const stationsListEl = document.getElementById("stations-list");
 stationsListEl.addEventListener("click", function (event) {
   selectStation(event.target.id);
 });
 
-setup();
+setupDataAndDisplay();
