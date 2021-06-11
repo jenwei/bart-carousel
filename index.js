@@ -25,8 +25,14 @@ const bartAPI = {
   url: "http://api.bart.gov/api/",
 };
 
+var stationsList = [];
+
 // Key stations by abbr
 var stationsMappedByAbbr = {};
+
+// Used to keep track of selected station
+var currentStationAbbr = undefined;
+var currentStationIndex = undefined;
 
 /**
  * BART data-gathering + manipulating
@@ -79,7 +85,7 @@ function buildResourcePath(command, options = {}) {
 /**
  * Helper to get all station-related data needed and set it up for card carousel display
  */
-function setupData() {
+function setup() {
   // Get all stations
   getAllStations()
     .then((stationList) => {
@@ -104,6 +110,13 @@ function setupData() {
         };
       });
       console.log("Done adding ETD data");
+
+      stationsList = Object.values(stationsMappedByAbbr);
+
+      // Default current station shown to first one returned from API
+      currentStationAbbr = stationList[0].abbr;
+      currentStationIndex = 0;
+
       return;
     })
     .then(() => updateDisplay());
