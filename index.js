@@ -1,14 +1,25 @@
 /** @format */
 
 /**
- * TODOs:
+ * General TODOs
  * - Extract Bart data-gathering logic into separate file
  * - Combine ETD functions as they're quite similar
+ * - Add keyboard nav (e.g. left, right key)
+ * - DRY up code
+ *
+ * TODOs re: carousel nav
+ * - Consider disabling the button?
+ * - (Nice to have) Show loading spinner
+ * - Update currentStation to next station in stationsMappedByAbbr
+ * - Use getETDsByStation() to update ETD for next station
+ * - (Nice to have) Once data is fetched, remove loading spinner + show updated card
  */
 
-// Uncomment the following when testing as fetch isn't implemented in Node
-// const fetch = require("node-fetch")
+/**
+ * Local Dev / Testing - use VSCode Live Server
+ */
 
+// Public Bart API key
 const bartAPI = {
   key: "MW9S-E7SL-26DU-VV8V",
   url: "http://api.bart.gov/api/",
