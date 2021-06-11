@@ -122,48 +122,97 @@ function setup() {
     .then(() => updateDisplay());
 }
 
-function updateDisplay() {
-  console.log(stationsMappedByAbbr);
+/**
+ * @param id [String | Number]
+ */
+function selectStation(id) {
+  // Remove selected class from current station button (should only ever have one selected)
+  var selectedStationEl = document.getElementsByClassName("selected")[0];
+  selectedStationEl.classList.remove("selected");
+
+  // Update current station pointers
+  currentStationIndex = parseInt(id);
+  let station = stationsList[currentStationIndex];
+  currentStationAbbr = station.abbr;
+
+  // Update card
+  populateCarouselCard(station);
+
+  // Add selected class to newly selected station
+  var newlySelectedEl = document.getElementById("" + currentStationIndex);
+  newlySelectedEl.classList.add("selected");
 }
 
 /**
- * General logic
+ * @param station [object]
  */
+function populateCarouselCard(station) {
+  var abbrEl = document.querySelector("#station-abbreviation");
+  abbrEl.innerHTML = "<h3>" + station.abbr + "</h3>";
+  var nameEl = document.querySelector("#station-name");
+  nameEl.innerHTML = station.name;
+  var addressEl = document.querySelector("#station-address");
+  addressEl.innerHTML = station.address;
+  var nextArrivalsEl = document.querySelector("#station-next-arrivals");
+  var nextArrivalsInnerHTML = "";
+  var nextArrivals = station.nextArrivals;
+  nextArrivals.forEach((arrival, index) => {
+    nextArrivalsInnerHTML += "<strong>" + arrival.abbreviation + "</strong>";
+    // Only showing the nearest arrival for a given destination
+    nextArrivalsInnerHTML += " (" + arrival.estimate[0].direction + ")";
+    nextArrivalsInnerHTML += " - " + arrival.estimate[0].minutes + " minute(s)";
+    if (index != nextArrivals.length - 1) {
+      nextArrivalsInnerHTML += "<br>";
+    }
+  });
+  nextArrivalsEl.innerHTML = nextArrivalsInnerHTML;
+}
 
-setupData();
+function populateStationsList() {
+  var stationsListEl = document.querySelector("#stations-list");
+  var stationsListInnerHTML = "";
+  stationsList.forEach((station, index) => {
+    stationsListInnerHTML += '<button id="' + index;
+    if (index === currentStationIndex) {
+      stationsListInnerHTML += '" class="button selected">';
+    } else {
+      stationsListInnerHTML += '" class="button">';
+    }
+    stationsListInnerHTML += station.abbr + "</button>";
+    stationsListEl.innerHTML = stationsListInnerHTML;
+  });
+}
 
-// const previous = document.getElementById("previous");
-// const next = document.getElementById("next");
+function updateDisplay() {
+  console.log(stationsMappedByAbbr);
+  populateCarouselCard(stationsList[currentStationIndex]);
+  populateStationsList();
+  // Set time
+  const today = new Date();
+  document.querySelector("#base-time").innerHTML =
+    "Last calculated at " + today.toString();
+}
 
-// // Populate stations list
-// var stationsListElement = document.getElementById("station-list");
-// for (const station in stationsMappedByAbbr) {
-//   let stationElement = document.createElement("div");
-//   stationElement.innerHTML = station.abbr;
-//   stationsListElement.appendChild(stationElement);
-// }
+const previousEl = document.getElementById("previous");
+const nextEl = document.getElementById("next");
+const stationsListEl = document.getElementById("stations-list");
 
-// DEFAULT to 16th
-// var currentStation = '16TH'
+previousEl.addEventListener("click", function () {
+  if (currentStationIndex === 0) return;
+  console.log("Go to previous card");
+  currentStationIndex--;
+  selectStation(currentStationIndex);
+});
 
-/**
- * TODO-dev: Add handling for previous button click
- * - If there is no station before the current one - do nothing (consider disabling the button?)
- * - (Nice to have) Show loading spinner
- * - Update currentStation to previous station in stationsMappedByAbbr
- * - Use getETDsByStation() to update ETD for previous station
- * - (Nice to have) Once data is fetched, remove loading spinner + show updated card
- * 
- * TODO-dev: Add handling for next button click
- * - If there is no station after the current one - do nothing (consider disabling the button?)
- *  * - (Nice to have) Show loading spinner
- * - Update currentStation to next station in stationsMappedByAbbr
- * - Use getETDsByStation() to update ETD for next station
- * - (Nice to have) Once data is fetched, remove loading spinner + show updated card
- * 
- * TODO-dev: Add handling for clicking and highlighting of station in list
- * - Add border around currentStation
- * - When another station is clicked, update currentStation
- * - Remove border styling from previous station and add to selected station
- */
+nextEl.addEventListener("click", function () {
+  if (currentStationIndex === stationsList.length - 1) return;
+  console.log("Go to next card");
+  currentStationIndex++;
+  selectStation(currentStationIndex);
+});
 
+stationsListEl.addEventListener("click", function (event) {
+  selectStation(event.target.id);
+});
+
+setup();
