@@ -32,6 +32,7 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   margin-bottom: 12px;
+  width: 50%;
 }
 
 #previous,
