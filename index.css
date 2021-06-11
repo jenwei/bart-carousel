@@ -27,8 +27,20 @@ body {
 }
 
 #previous, #next {
+#stations-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+#previous,
+#next {
   margin: 8px;
-}  background-color: #ffffff;
+}
+
+.button {
+  background-color: #ffffff;
   border: 2px solid black;
   padding: 8px 16px;
   color: black;
