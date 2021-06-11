@@ -28,4 +28,25 @@ body {
 
 #previous, #next {
   margin: 8px;
+}  background-color: #ffffff;
+  border: 2px solid black;
+  padding: 8px 16px;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px;
+}
+
+.button.selected {
+  background-color: #484848;
+  border: 2px solid black;
+  padding: 8px 16px;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px;
 }
