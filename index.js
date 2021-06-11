@@ -191,21 +191,30 @@ const previousEl = document.getElementById("previous");
 previousEl.addEventListener("click", function () {
   if (currentStationIndex === 0) return;
   console.log("Go to previous card");
+  document.querySelector(".card").style.opacity = 0;
   currentStationIndex--;
-  selectStation(currentStationIndex);
+  setTimeout(() => {
+    selectStation(currentStationIndex);
+  }, 250);
 });
 
 const nextEl = document.getElementById("next");
 nextEl.addEventListener("click", function () {
   if (currentStationIndex === stationsList.length - 1) return;
   console.log("Go to next card");
+  document.querySelector(".card").style.opacity = 0;
   currentStationIndex++;
-  selectStation(currentStationIndex);
+  setTimeout(() => {
+    selectStation(currentStationIndex);
+  }, 250);
 });
 
 const stationsListEl = document.getElementById("stations-list");
 stationsListEl.addEventListener("click", function (event) {
-  selectStation(event.target.id);
+  document.querySelector(".card").style.opacity = 0;
+  setTimeout(() => {
+    selectStation(event.target.id);
+  }, 250);
 });
 
 setupDataAndDisplay();
